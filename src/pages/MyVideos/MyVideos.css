@@ -9,3 +9,9 @@
     align-items: center;
     background-color: white;
 }
+
+.header {
+    display: flex;
+    border: 1px solid red;
+}
+
