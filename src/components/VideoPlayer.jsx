@@ -1,41 +1,30 @@
-import './MyVideos.css';
+import {Fragment, useEffect, useRef, useState} from "react";
 import ReactHlsPlayer from "react-hls-player";
-import {Fragment, useRef, useState} from "react";
-import {createNewFlow, deleteExistingFlow} from "../../utils/superfluid.js";
+import {createNewFlow, deleteExistingFlow} from "../utils/superfluid.js";
 
-const receiver = '0x2819Db886a1C12C74Edf3514F831dfA00bFc101F';
-const flowRate = "5787037037037";
+function VideoPlayer(props) {
+    const {receiver, flowRate, onFlowCreated} = props;
 
-function MyVideos() {
     const [flow, setFlow] = useState(null);
     const [isTalkingToBlockchain, setIsTalkingToBlockchain] = useState(false);
 
     const player = useRef(null);
 
+    useEffect(() => {
+        if (flow) {
+            onFlowCreated(flow);
+        }
+    }, [flow]);
+
     function render() {
         return (
             <Fragment>
-                {_showConnectedAccount()}
                 {_renderOverlay()}
                 {_renderVideoPlayer()}
                 <button onClick={_onPlay}>Play</button>
                 <button onClick={_onPause}>Stop</button>
             </Fragment>
         )
-    }
-
-    function _renderVideoViewArea() {
-        return (
-            <div>
-
-            </div>
-        )
-    }
-
-    function _showConnectedAccount() {
-        return (
-            <div>{localStorage.getItem('account')}</div>
-        );
     }
 
     function _renderOverlay() {
@@ -75,8 +64,7 @@ function MyVideos() {
         }).catch(console.error);
     }
 
-
     return render();
 }
 
-export default MyVideos;
+export default VideoPlayer;

@@ -5,10 +5,7 @@ import {checkIfWalletIsConnected, connectWallet} from "./utils/wallet";
 import {createNewFlow, deleteExistingFlow} from "./utils/superfluid";
 import ReactHlsPlayer from 'react-hls-player';
 
-
-//const receiver = '0x358A4567d62b6632169BBAdfA0884aB56b315c24';
 const receiver = '0x2819Db886a1C12C74Edf3514F831dfA00bFc101F';
-//const flowRate = "100000000";
 
 const flowRate = "5787037037037";
 
@@ -26,7 +23,6 @@ function App() {
     const [currentAccount, setCurrentAccount] = useState();
 
     const player = useRef(null);
-
 
     useEffect(() => {
         checkIfWalletIsConnected().then((account) => {
@@ -61,7 +57,6 @@ function App() {
             setLoading(false)
         }).catch(console.error);
     }
-
 
     function render() {
         return (
