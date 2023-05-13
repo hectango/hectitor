@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import contractABI from '../fdaix.json';
 
 export async function connectWallet() {
     try {
@@ -63,15 +64,22 @@ function formatBalance(rawBalance) {
 export async function getBalanceToken(contractAddress) {
     await ethereum.request({ method: 'eth_requestAccounts' });
 
+
+    //Now you need its provider
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     //To get signer and its address use function below:
     const signer = provider.getSigner();
     const signerAddress = await signer.getAddress();
 
-    //Now you need its provider
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const contract = await new ethers.Contract(contractAddress, contractABI, signer);
+    console.log(contractABI)
+    console.log(contractABI.result)
 
-    return contract;
+    const contract = await new ethers.Contract(contractAddress, contractABI.result, signer);
+
+    const result = await contract.methods.balanceOf(contractAddress).call();
+    console.log(result);
+
+    return 1;
 }
 
 function formatChainAsNum(chainIdHex) {
