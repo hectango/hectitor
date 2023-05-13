@@ -1,12 +1,9 @@
-import "vidstack/styles/base.css";
-// the following styles are optional - remove to go headless.
-import "vidstack/styles/ui/buttons.css";
-import "vidstack/styles/ui/sliders.css";
+import "./App.css";
 
-import {MediaPlayer, MediaOutlet, useMediaRemote} from "@vidstack/react";
 import {Fragment, useEffect, useRef, useState} from 'react';
-import {checkIfWalletIsConnected, connectWallet, getBalance, getBalanceToken} from "./utils/wallet";
+import {checkIfWalletIsConnected, connectWallet} from "./utils/wallet";
 import {createNewFlow, deleteExistingFlow} from "./utils/superfluid";
+import ReactHlsPlayer from 'react-hls-player';
 
 
 //const receiver = '0x358A4567d62b6632169BBAdfA0884aB56b315c24';
@@ -22,17 +19,13 @@ const flowRate = "5787037037037";
 }*/
 
 function App() {
-    const [playing, setPlaying] = useState('carga');
     const [flow, setFlow] = useState(null);
-    const [startBlockchainCommunication, setStartBlockchainCommunication] = useState(null);
     const [isLoading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
-    const [balance, setBalance] = useState(null);
     const [isConnectingToWallet, setIsConnectingToWallet] = useState(true);
     const [currentAccount, setCurrentAccount] = useState();
 
     const player = useRef(null);
-    const remote = useMediaRemote(player);
 
 
     useEffect(() => {
@@ -44,59 +37,51 @@ function App() {
     useEffect(() => {
         setIsConnectingToWallet(false);
         setErrorMessage(null);
-        //getBalanceToken('0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f').then((b) => setBalance(b));
     }, [currentAccount]);
-
-    useEffect(() => {
-        setLoading(false);
-        console.log('llegaaaaaa', flow)
-        if(flow) {
-            console.log('con flujo en mano')
-            remote.play();
-        }
-    }, [flow]);
-
-    useEffect(() => {
-        if(startBlockchainCommunication === 'start') {
-            setLoading(true);
-            createNewFlow(receiver, flowRate).then((flow) => {
-                setFlow(flow);
-            }).catch(console.error)
-        }
-    }, [startBlockchainCommunication]);
-
-    /*player?.addEventListener('play', () => {
-        setStartBlockchainCommunication(true);
-    });
-
-    player?.addEventListener('pause', () => {
-        setLoading(true);
-        deleteExistingFlow(receiver).then(() => setLoading(false)).catch(console.error);
-    });*/
 
     useEffect(() =>{
         setLoading(true);
         deleteExistingFlow(receiver).then(() => setLoading(false)).catch(console.error);
     }, []);
 
-    function onPointerUp(e) {
-        // - We are providing the "trigger" here.
-        // - The media play event will have this pointer event in its chain.
-        remote.togglePaused(e);
+    function _onPlay() {
+        setLoading(true);
+        createNewFlow(receiver, flowRate).then((flow) => {
+            setFlow(flow);
+            player.current.play();
+            setLoading(false);
+        }).catch(console.error)
     }
 
-    function render() {
-        if (isLoading) return 'We are communicating with the blockchain.....';
+    function _onPause() {
+        player.current.pause();
+        setLoading(true);
+        deleteExistingFlow(receiver).then(() => {
+            setFlow(null);
+            setLoading(false)
+        }).catch(console.error);
+    }
 
+
+    function render() {
         return (
-            <div className="App">
-                {/*_renderBalance()*/}
+            <Fragment>
+                {_renderOverlay()}
                 {_renderErrorMessage()}
                 {_renderConnectButton()}
                 {_renderVideoPlayer()}
-                <button onClick={onPointerUp}>test</button>
-            </div>
+                <button onClick={_onPlay}>Play</button>
+                <button onClick={_onPause}>Stop</button>
+            </Fragment>
         );
+    }
+
+    function _renderOverlay() {
+        if (isLoading) {
+            return <div className={"overlay"}>
+                <p>We are communicating with the blockchain.....</p>
+            </div>
+        }
     }
 
     function _renderErrorMessage() {
@@ -124,29 +109,14 @@ function App() {
     function _renderVideoPlayer() {
         return (
             <Fragment>
-                <MediaPlayer
-                    ref={player}
+                <ReactHlsPlayer
+                    playerRef={player}
                     src="https://customer-wo7syqqap4g20awy.cloudflarestream.com/0d58d9d181fb619cce31def2509af262/manifest/video.m3u8"
-                    poster="https://customer-wo7syqqap4g20awy.cloudflarestream.com/0d58d9d181fb619cce31def2509af262/thumbnails/thumbnail.jpg"
-                    aspectRatio={16/9}
-                    onPlay={() => {
-                        setStartBlockchainCommunication('start');
-                    }}
-                >
-                    <MediaOutlet />
-                </MediaPlayer>
+                    width={200}
+                    height={200}
+                />
             </Fragment>
         );
-    }
-
-    function _renderBalance() {
-        return (
-            <div>{JSON.stringify(balance)}</div>
-        )
-    }
-
-    function _onPlayStopHandler() {
-        setPlaying(!playing);
     }
 
     async function _onConnectToWalletHandler() {
