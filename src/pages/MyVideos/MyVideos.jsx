@@ -1,6 +1,6 @@
 import './MyVideos.css';
 import {Fragment} from "react";
-import VideoPlayer from "../../components/VideoPlayer.jsx";
+import VideoPlayer from "../../components/VideoPlayer/VideoPlayer.jsx";
 import Header from "../../components/Header/Header.jsx";
 
 const receiver = '0x2819Db886a1C12C74Edf3514F831dfA00bFc101F';

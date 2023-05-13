@@ -1,0 +1,8 @@
+.Controls {
+    display: flex;
+}
+
+.IconButton {
+    cursor: pointer;
+    height: 50px;
+}

@@ -1,6 +1,9 @@
+import './VideoPlayer.css';
 import {Fragment, useEffect, useRef, useState} from "react";
 import ReactHlsPlayer from "react-hls-player";
-import {createNewFlow, deleteExistingFlow} from "../utils/superfluid.js";
+import {createNewFlow, deleteExistingFlow} from "../../utils/superfluid.js";
+import Play from '../../assets/play.png';
+import Pause from '../../assets/pause.png';
 
 function VideoPlayer(props) {
     const {receiver, flowRate, onFlowCreated} = props;
@@ -21,10 +24,19 @@ function VideoPlayer(props) {
             <Fragment>
                 {_renderOverlay()}
                 {_renderVideoPlayer()}
-                <button onClick={_onPlay}>Play</button>
-                <button onClick={_onPause}>Stop</button>
+                {_renderControlButtons()}
             </Fragment>
         )
+    }
+
+    function _renderControlButtons() {
+        return (
+            <div className="Controls">
+                <img className={'IconButton'} src={Play} onClick={_onPlay}/>
+                <img className={'IconButton'} src={Pause} onClick={_onPause}/>
+            </div>
+
+        );
     }
 
     function _renderOverlay() {
@@ -40,8 +52,8 @@ function VideoPlayer(props) {
             <ReactHlsPlayer
                 playerRef={player}
                 src="https://customer-wo7syqqap4g20awy.cloudflarestream.com/0d58d9d181fb619cce31def2509af262/manifest/video.m3u8"
-                width={200}
-                height={200}
+                width="100%"
+                height="auto"
             />
         );
     }
