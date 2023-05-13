@@ -7,7 +7,6 @@ const receiver = '0x2819Db886a1C12C74Edf3514F831dfA00bFc101F';
 const flowRate = "5787037037037";
 
 function MyVideos() {
-
     function render() {
         return (
             <Fragment>
